@@ -1,20 +1,41 @@
-const http = require('http');
+const http = require('node:http');
 const fs = require('node:fs')
-const url = "./test.txt"
+const path = require('node:path');
 
 const port = process.env.port || 3000
+let filename = "./test.txt"  // default
+let extname = ''
+let contentType =''
 
-
-fs.readFile(url, (err, html) => {
-
-  if(err) {
-    throw new Error('no such page')
-  }
 
 http.createServer((req, res) => {
-  res.writeHead(200, {"content-type": "text/plain"})
-  res.write(html)
-  res.end()
 
-}).listen(port)
+  filename = "." + req.url
+
+  console.log(req.url)
+  extname = path.extname(req.url)
+  console.log(extname)
+
+  switch(extname) {
+    case ".txt" :
+      contentType = 'text/plain'
+      break;
+    default :
+      contentType = "text/html"
+      filename = "./test.txt"
+
+  }
+
+
+  fs.readFile(filename, (err, html) => {
+
+    if(err) {
+      throw new Error('Error 404')
+    }
+
+  res.writeHead(200, {contentType})
+  res.write(html)
+  return res.end()
+
 })
+}).listen(port)
