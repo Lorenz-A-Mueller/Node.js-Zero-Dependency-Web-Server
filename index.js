@@ -4,22 +4,37 @@ const path = require('node:path');
 
 
 const port = process.env.port || 3000
-let extname = ''
 let contentType =''
 
 
 http.createServer((req, res) => {
 
-  let filename = "." + req.url
+  let filename = "./public" + req.url   // request can only be within public directory
 
   console.log(req.url)
-  extname = path.extname(req.url)
+  const extname = path.extname(req.url)
   console.log(extname)
+  console.log(filename, 'this')
 
   switch(extname) {
+
+    case "" :
+      contentType = {'Content-Type':'text/html'}
+      if (filename.length === 9) {                 // no user input (filename is only ./public/   ; 9 characters)
+        filename = "./public/index.html" } else{
+          filename = `${filename}/index.htm`    // if no extension (but not nothing), interpret it as a folder and try open index.htm within it
+        }
+      break;
+
     case ".html" :
       contentType = {'Content-Type':'text/html'}
       break;
+      case ".htm" :
+      contentType = {'Content-Type':'text/html'}
+      break;
+
+
+
       case ".txt" :
         contentType = {'Content-Type':'text/plain'}
         break;
@@ -32,9 +47,24 @@ http.createServer((req, res) => {
       case ".css" :
         contentType = {'Content-Type':'text/css'}
         break;
+      case ".jpg" :
+        contentType = {'Content-Type':'image/jpeg'}
+        break;
+        case ".jpeg" :
+      contentType = {'Content-Type':'image/jpeg'}
+      break;
+      case ".jpe" :
+      contentType = {'Content-Type':'image/jpeg'}
+      break;
+      case ".png" :
+      contentType = {'Content-Type':'image/png'}
+      break;
+      case ".ico" :
+      contentType = {'Content-Type':'image/x-icon'}
+      break;
     default :
       contentType = {'Content-Type': "text/html"}
-      filename = "./index.html"
+      filename = "./public/index.html"
 
   }
 
@@ -46,8 +76,10 @@ http.createServer((req, res) => {
       // return res.end("404 Not Found");
 
       fs.readFile("./error.html", ((error, data) => {
-        if (error) {}
-        res.writeHead(200, {'Content-Type':'text/html'})
+        if (error) {
+          return res.end("Error 404, page not found.")
+        }
+        res.writeHead(404, {'Content-Type':'text/html'})
         res.write(data)
         return res.end()
         })
@@ -60,4 +92,7 @@ http.createServer((req, res) => {
   }
 })
 
-}).listen(port)
+}).on("error", err => console.log(err, "Server Error!"))
+.listen(port, () => {
+ console.log(`Listening on port ${port}...`)
+})
