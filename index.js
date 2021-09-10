@@ -8,28 +8,24 @@ let contentType = '';
 http
   .createServer((req, res) => {
     let filename = './public' + req.url; // request can only be within public directory
-
-    console.log(req.url);
     let extname = path.extname(req.url);
-    console.log(extname);
-    console.log(filename, 'this');
 
     // check whether files exists. If not, get the error-page.
 
     try {
       fs.accessSync(filename);
-      console.log('exists');
     } catch {
-      console.log('does not');
       filename = './public/error.html';
       extname = '.html';
     }
+
+    // check extension and set Content-Type accordingly.
 
     switch (extname) {
       case '':
         contentType = { 'Content-Type': 'text/html' };
         if (filename.length === 9) {
-          // no user input (filename is only ./public/   ; 9 characters)
+          // no user input (filename is only ./public/   -> 9 characters)
           filename = './public/index.html';
         } else {
           filename = `${filename}/index.htm`; // if no extension (but not nothing), interpret it as a folder and try open index.htm within it
@@ -42,7 +38,6 @@ http
       case '.htm':
         contentType = { 'Content-Type': 'text/html' };
         break;
-
       case '.txt':
         contentType = { 'Content-Type': 'text/plain' };
         break;
@@ -76,11 +71,12 @@ http
     }
 
     fs.readFile(filename, (err, html) => {
-      // if page couldn't load or if it didn't exist
+      // if page couldn't load or if it doesn't exist
 
       if (err || filename === './public/error.html') {
         fs.readFile('./public/error.html', (error, data) => {
           if (error) {
+            // if error-page couldn't load
             res.writeHead(404, {
               'Content-Type': 'text/plain',
             });
@@ -90,6 +86,8 @@ http
           res.write(data);
           return res.end();
         });
+
+        // else get the right content
       } else {
         res.writeHead(200, contentType);
         res.write(html);
