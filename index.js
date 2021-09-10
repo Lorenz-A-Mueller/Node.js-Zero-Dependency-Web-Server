@@ -10,7 +10,7 @@ http
     let filename = './public' + req.url; // request can only be within public directory
 
     console.log(req.url);
-    const extname = path.extname(req.url);
+    let extname = path.extname(req.url);
     console.log(extname);
     console.log(filename, 'this');
 
@@ -20,7 +20,9 @@ http
       fs.accessSync(filename);
       console.log('exists');
     } catch {
+      console.log('does not');
       filename = './public/error.html';
+      extname = '.html';
     }
 
     switch (extname) {
