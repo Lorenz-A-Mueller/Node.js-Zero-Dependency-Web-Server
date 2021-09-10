@@ -77,7 +77,7 @@ http
       // if page couldn't load or if it didn't exist
 
       if (err || filename === './public/error.html') {
-        fs.readFile('./error.html', (error, data) => {
+        fs.readFile('./public/error.html', (error, data) => {
           if (error) {
             res.writeHead(404, {
               'Content-Type': 'text/plain',
